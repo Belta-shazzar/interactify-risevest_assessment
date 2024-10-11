@@ -10,6 +10,7 @@ import rateLimit from "express-rate-limit";
 import { logger, stream } from "@/utils/logger";
 import { ErrorMiddleware } from "@/middlewares/error.middleware";
 import { HttpException } from "@/exceptions/http.exception";
+import httpStatus from "http-status";
 
 export class App {
   public app: express.Application;
@@ -22,6 +23,7 @@ export class App {
     this.port = config.app.port;
 
     this.initializeMiddleware();
+    // this.initializeResponseTransform()
     this.initializeRoutes(routes);
     this.initializeErrorHandling();
   }
@@ -38,7 +40,7 @@ export class App {
   }
 
   private initializeMiddleware() {
-    this.app.use(morgan(config.logs.format, { stream })); //TODO: Combine morgan with winston
+    this.app.use(morgan(config.logs.format, { stream }));
     this.app.use(
       cors({ origin: config.cors.origin, credentials: config.cors.credentials })
     );
@@ -53,7 +55,12 @@ export class App {
         standardHeaders: true,
         legacyHeaders: false,
         handler: (req, res, next) => {
-          next(new HttpException(429, `Rate limit exceeded for IP: ${req.ip}`));
+          next(
+            new HttpException(
+              httpStatus.TOO_MANY_REQUESTS,
+              `Rate limit exceeded for IP: ${req.ip}`
+            )
+          );
         },
       })
     );
@@ -64,6 +71,10 @@ export class App {
       this.app.use("/", route.router);
     });
   }
+
+  // private initializeResponseTransform() {
+  //   this.app.use(transformResponse);
+  // }
 
   private initializeErrorHandling() {
     this.app.use(ErrorMiddleware);

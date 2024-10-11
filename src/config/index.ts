@@ -4,7 +4,7 @@ import { Config } from "@/interfaces/config.interface";
 const config: Config = {
   app: {
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
-    jwtSecret: process.env.JWT_SECRET!,
+    jwtSecret: process.env.SECRET_KEY!,
     node_env: process.env.NODE_ENV!,
   },
   cors: {

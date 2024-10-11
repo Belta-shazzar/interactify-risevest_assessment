@@ -1,6 +1,7 @@
 import { AuthController } from "@/controllers/auth.controller";
-import { SignUpDto } from "@/dto/auth.dto";
+import { LoginDto, SignUpDto } from "@/dto/auth.dto";
 import { Routes } from "@/interfaces/routes.interface";
+import { AuthMiddleware } from "@/middlewares/auth.middleware";
 import { ValidationMiddleware } from "@/middlewares/validation.middleware";
 import { Router } from "express";
 
@@ -18,6 +19,16 @@ export class AuthRoute implements Routes {
       `${this.path}/sign-up`,
       ValidationMiddleware(SignUpDto),
       this.authController.signup
+    );
+    this.router.post(
+      `${this.path}/login`,
+      ValidationMiddleware(LoginDto),
+      this.authController.login
+    );
+    this.router.get(
+      `${this.path}/authenticated`,
+      AuthMiddleware,
+      this.authController.getAuthenticatedUser
     );
   }
 }

@@ -51,6 +51,7 @@
     "express-rate-limit": "^7.4.1",
     "helmet": "^8.0.0",
     "hpp": "^0.2.3",
+    "http-status": "^1.7.4",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "reflect-metadata": "^0.2.2",
