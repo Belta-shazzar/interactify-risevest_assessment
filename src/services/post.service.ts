@@ -11,11 +11,11 @@ export class PostService {
     postDto: CreatePostDto,
     author: Partial<User>
   ): Promise<Post> {
-    const user = await this.post.create({
+    const post = await this.post.create({
       data: { ...postDto, authorId: author.id },
     });
 
-    return user;
+    return post;
   }
 
   public async getPostById(postId: string): Promise<Post> {
