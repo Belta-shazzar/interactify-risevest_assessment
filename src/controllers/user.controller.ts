@@ -1,5 +1,6 @@
 import { UserService } from "@/services/user.service";
 import { Request, Response, NextFunction } from "express";
+import httpStatus from "http-status";
 
 export class UserController {
   private userService = new UserService();
@@ -11,7 +12,7 @@ export class UserController {
 
       const response = await this.userService.getUsers(page, limit);
 
-      res.status(201).json({ ...response });
+      res.status(httpStatus.OK).json({ ...response });
     } catch (error) {
       next(error);
     }

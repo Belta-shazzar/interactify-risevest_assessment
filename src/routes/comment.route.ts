@@ -5,7 +5,7 @@ import { Router } from "express";
 export class CommentRoute implements Routes {
   public path = "/comments";
   public router = Router();
-  public commentController = new CommentController();
+  private commentController = new CommentController();
 
   constructor() {
     this.initializeRoutes();
