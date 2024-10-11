@@ -5,7 +5,11 @@ export interface Config {
     node_env: string;
   };
   cors: {
-    origin: string,
+    origin: string;
     credentials: boolean;
-  }
+  };
+  logs: {
+    format: string;
+    directory: string;
+  };
 }

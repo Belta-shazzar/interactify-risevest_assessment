@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import express from "express";
 import { Routes } from "@/interfaces/routes.interface";
 import config from "@/config";
@@ -6,6 +7,9 @@ import hpp from "hpp";
 import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+import { logger, stream } from "@/utils/logger";
+import { ErrorMiddleware } from "@/middlewares/error.middleware";
+import { HttpException } from "@/exceptions/http.exception";
 
 export class App {
   public app: express.Application;
@@ -24,7 +28,8 @@ export class App {
 
   public listen() {
     this.app.listen(this.port, () => {
-      console.log("Tada!!!!");
+      logger.info(`======= ENV: ${this.env} ========`);
+      logger.info(`🚀 App listening on the port ${this.port}`);
     });
   }
 
@@ -33,7 +38,7 @@ export class App {
   }
 
   private initializeMiddleware() {
-    this.app.use(morgan("dev")); //TODO: Combine morgan with winston
+    this.app.use(morgan(config.logs.format, { stream })); //TODO: Combine morgan with winston
     this.app.use(
       cors({ origin: config.cors.origin, credentials: config.cors.credentials })
     );
@@ -48,7 +53,7 @@ export class App {
         standardHeaders: true,
         legacyHeaders: false,
         handler: (req, res, next) => {
-          // next(new HttpException(429, `Rate limit exceeded for IP: ${req.ip}`));
+          next(new HttpException(429, `Rate limit exceeded for IP: ${req.ip}`));
         },
       })
     );
@@ -61,6 +66,6 @@ export class App {
   }
 
   private initializeErrorHandling() {
-    // this.app.use(ErrorMiddleware);
+    this.app.use(ErrorMiddleware);
   }
 }

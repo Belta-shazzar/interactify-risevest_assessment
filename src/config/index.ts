@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { Config } from "@/interfaces/config.interface";
 
 const config: Config = {
@@ -9,6 +10,10 @@ const config: Config = {
   cors: {
     origin: process.env.CORS_ORIGIN!,
     credentials: Boolean(process.env.CORS_CREDENTIALS!),
+  },
+  logs: {
+    format: process.env.LOG_FORMAT!,
+    directory: process.env.LOG_DIR!,
   },
 };
 

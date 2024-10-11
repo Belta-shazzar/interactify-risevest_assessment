@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 30
+    },
+    "auditLog": "/Users/macbookairm1/VSCode/krow/assessment/risevest/interactify/src/utils/error/.ba3f0ff3edec03d6466e1c7066affcf4bb459e4c-audit.json",
+    "files": [
+        {
+            "date": 1728623332740,
+            "name": "/Users/macbookairm1/VSCode/krow/assessment/risevest/interactify/src/utils/error/2024-10-11.log",
+            "hash": "2ff53bc2f1ed239a60fe497cf281553b4b4a79b24cf40b209b910302cdd0220d"
+        }
+    ],
+    "hashType": "sha256"
+}
