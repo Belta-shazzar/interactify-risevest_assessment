@@ -12,11 +12,9 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write .",
+    "prisma:init": "prisma init",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:prod": "prisma migrate deploy",
-    "prisma:studio": "prisma studio",
-    "prisma:seed": "ts-node prisma/seed.ts",
+    "prisma:migrate": "prisma migrate dev --preview-feature",
     "clean": "rimraf dist"
   },
   "keywords": [],
@@ -43,6 +41,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@prisma/client": "5.20.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",

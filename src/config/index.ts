@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import "dotenv/config";
 import { Config } from "@/interfaces/config.interface";
 
 const config: Config = {
@@ -14,6 +14,9 @@ const config: Config = {
   logs: {
     format: process.env.LOG_FORMAT!,
     directory: process.env.LOG_DIR!,
+  },
+  database: {
+    url: process.env.DATABASE_URL!,
   },
 };
 

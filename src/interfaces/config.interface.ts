@@ -12,4 +12,7 @@ export interface Config {
     format: string;
     directory: string;
   };
+  database: {
+    url: string;
+  };
 }
