@@ -5,11 +5,13 @@ import { Router } from "express";
 export class UserRoute implements Routes {
   public path = "/users";
   public router = Router();
-  public userController = new UserController();
+  private userController = new UserController();
 
   constructor() {
     this.initializeRoutes();
   }
 
-  private initializeRoutes() {}
+  private initializeRoutes() {
+    this.router.get(`${this.path}`, this.userController.getUsers);
+  }
 }

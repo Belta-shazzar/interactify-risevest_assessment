@@ -14,7 +14,6 @@ export class AuthController {
 
       res.status(201).json({ ...response });
     } catch (error) {
-      logger.error(error);
       next(error);
     }
   };
