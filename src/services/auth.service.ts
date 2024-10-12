@@ -57,7 +57,7 @@ export class AuthService {
   private createToken(userId: string): string {
     const dataStoredInToken: DataStoredInToken = { id: userId };
     const secretKey: string = config.app.jwtSecret;
-    const expiresIn: number = 60 * 60;
+    const expiresIn: number = 60 * 3600;
 
     return sign(dataStoredInToken, secretKey, { expiresIn });
   }

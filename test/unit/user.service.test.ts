@@ -64,4 +64,7 @@ describe("User Service", () => {
     expect(typeof response.count).toBe("number");
     expect(typeof response.currentPage).toBe("number");
   });
+
+  it("should get top three users", async () => {});
+  it("should get top three users with their last comments", async () => {});
 });

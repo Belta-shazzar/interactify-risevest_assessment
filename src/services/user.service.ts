@@ -53,58 +53,68 @@ export class UserService {
     return stripedUser;
   }
 
+  // Optmized the exact query in the query optimization task
   public async getTopThreeAuthorsByPostCount(): Promise<any> {
     const users = await this.prisma.$queryRaw`
-    WITH LatestComments AS (
-      SELECT "c.postId", c.content, "c.createdAt",
-             ROW_NUMBER() OVER (PARTITION BY "c.postId" ORDER BY "c.createdAt" DESC) as rn
-      FROM "Comment" c
-    )
-    SELECT u.id, u.name, p.title, lc.content
-    FROM "User" u
-    LEFT JOIN "Post" p ON u.id = "p.authorId"
-    LEFT JOIN LatestComments lc ON p.id = "lc.postId" AND lc.rn = 1
-    GROUP BY u.id, u.name, p.title, lc.content
-    ORDER BY COUNT(p.id) DESC
-    LIMIT 3;
-  `;
+        WITH UserPostCounts AS (
+        SELECT "authorId", COUNT(id)::INTEGER AS post_count
+        FROM "Post"
+        GROUP BY "authorId"
+      ),
+      LatestPosts AS (
+        SELECT DISTINCT ON (p."authorId") 
+          p."authorId", p.title, p.id AS "postId"
+        FROM "Post" p
+        ORDER BY p."authorId", p."createdAt" DESC
+      ),
+      LatestComments AS (
+        SELECT DISTINCT ON (c."postId")
+          c."postId", c.content
+        FROM "Comment" c
+        ORDER BY c."postId", c."createdAt" DESC
+      )
+      SELECT 
+        u.id, 
+        u.name, 
+        lp.title AS latest_post_title, 
+        lc.content AS latest_comment, 
+        COALESCE(upc.post_count, 0) AS post_count
+      FROM "User" u
+      LEFT JOIN UserPostCounts upc ON u.id = upc."authorId"
+      LEFT JOIN LatestPosts lp ON u.id = lp."authorId"
+      LEFT JOIN LatestComments lc ON lp."postId" = lc."postId"
+      ORDER BY post_count DESC
+      LIMIT 3;`;
 
     return users;
   }
 
+  // Query for the performance challenge
   public async getTopThreeAuthorsByPostCountWithTheirLatestComment(): Promise<any> {
     const users = await this.prisma.$queryRaw`
-    WITH TopUsers AS (
-        SELECT 
-            u.id,
-            u.name,
-            u.email,
-            COUNT(p.id) AS post_count
-        FROM users u
-        JOIN posts p ON u.id = p.authorId
-        GROUP BY u.id, u.name, u.email
-        ORDER BY post_count DESC
-        LIMIT 3
-    ),
-    LatestComments AS (
-        SELECT 
-            c.userId,
-            c.content,
-            c.createdAt,
-            ROW_NUMBER() OVER (PARTITION BY c.userId ORDER BY c.createdAt DESC) AS rn
-        FROM comments c
-    )
-    SELECT 
-        tu.id AS userId,
-        tu.name,
-        tu.email,
-        tu.post_count,
-        lc.comment_text AS latest_comment
-    FROM TopUsers tu
-    LEFT JOIN LatestComments lc ON tu.id = lc.userId
-    WHERE lc.rn = 1;
-  `;
-
+  WITH UserPostCounts AS (
+    SELECT "authorId", COUNT(id)::INTEGER AS post_count
+    FROM "Post"
+    GROUP BY "authorId"
+  ),
+  LatestUserComments AS (
+    SELECT DISTINCT ON (c."userId")
+      c."userId", c.content, c."createdAt"
+    FROM "Comment" c
+    ORDER BY c."userId", c."createdAt" DESC
+  )
+  SELECT 
+    u.id, 
+    u.name, 
+    COALESCE(upc.post_count, 0) AS post_count,
+    luc.content AS latest_comment,
+    luc."createdAt" AS latest_comment_date
+  FROM "User" u
+  LEFT JOIN UserPostCounts upc ON u.id = upc."authorId"
+  LEFT JOIN LatestUserComments luc ON u.id = luc."userId"
+  ORDER BY post_count DESC
+  LIMIT 3;
+`;
     return users;
   }
 }
