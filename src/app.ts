@@ -11,6 +11,7 @@ import { logger, stream } from "@/utils/logger";
 import { ErrorMiddleware } from "@/middlewares/error.middleware";
 import { HttpException } from "@/exceptions/http.exception";
 import httpStatus from "http-status";
+import ResponseInterceptor from "@/middlewares/transform-response.middleware";
 
 export class App {
   public app: express.Application;
@@ -23,7 +24,7 @@ export class App {
     this.port = config.app.port;
 
     this.initializeMiddleware();
-    // this.initializeResponseTransform()
+    this.initializeResponseTransform();
     this.initializeRoutes(routes);
     this.initializeErrorHandling();
   }
@@ -72,9 +73,9 @@ export class App {
     });
   }
 
-  // private initializeResponseTransform() {
-  //   this.app.use(transformResponse);
-  // }
+  private initializeResponseTransform() {
+    this.app.use(ResponseInterceptor);
+  }
 
   private initializeErrorHandling() {
     this.app.use(ErrorMiddleware);
