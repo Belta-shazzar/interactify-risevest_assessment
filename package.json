@@ -15,13 +15,21 @@
     "prisma:init": "prisma init",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --preview-feature",
+    "seeder:seed": "ts-node seeders/seed.ts",
     "clean": "rimraf dist"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma",
+    "seed": "tsx src/prisma/seed/seed.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@faker-js/faker": "^9.0.3",
+    "@snaplet/copycat": "^5.1.0",
+    "@snaplet/seed": "0.98.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
@@ -38,6 +46,7 @@
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.1",
     "typescript": "^5.6.3"
   },
   "dependencies": {
