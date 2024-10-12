@@ -17,4 +17,33 @@ export class UserController {
       next(error);
     }
   };
+
+  public getTopThreeAuthorsByPostCount = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const response = await this.userService.getTopThreeAuthorsByPostCount();
+
+      res.status(httpStatus.OK).json({ ...response });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getTopThreeAuthorsByPostCountWithTheirLatestComment = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const response =
+        await this.userService.getTopThreeAuthorsByPostCountWithTheirLatestComment();
+
+      res.status(httpStatus.OK).json({ ...response });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

@@ -21,7 +21,9 @@ export class PostRoute implements Routes {
       InputValidationMiddleware(CreatePostDto),
       this.postController.createPost
     );
+
     this.router.get(`${this.path}/:postId`, this.postController.getAPost);
+
     this.router.get(
       `${this.path}/:authorId/author`,
       this.postController.getAnAuthorPosts

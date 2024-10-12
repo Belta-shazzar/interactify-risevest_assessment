@@ -23,6 +23,7 @@ model User {
   
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
 }
 
 model Post {
@@ -35,6 +36,7 @@ model Post {
 
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
 
   @@index([authorId])
   @@index([createdAt])
@@ -50,6 +52,7 @@ model Comment {
 
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
 
   @@index([postId])
   @@index([createdAt])

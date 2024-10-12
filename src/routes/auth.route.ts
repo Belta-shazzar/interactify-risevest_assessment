@@ -20,11 +20,13 @@ export class AuthRoute implements Routes {
       InputValidationMiddleware(SignUpDto),
       this.authController.signup
     );
+
     this.router.post(
       `${this.path}/login`,
       InputValidationMiddleware(LoginDto),
       this.authController.login
     );
+    
     this.router.get(
       `${this.path}/authenticated`,
       AuthMiddleware,
