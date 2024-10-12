@@ -17,6 +17,7 @@ const config: Config = {
   },
   database: {
     url: process.env.DATABASE_URL!,
+    redisHost: process.env.REDIS_HOST!
   },
 };
 
