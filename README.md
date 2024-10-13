@@ -34,6 +34,11 @@ To test that it works, run `yarn seeder:seed` to seed the database after setting
 - Run `yarn prisma:migrate` to sync models with database
 - Connect to database with your choice database client
 
+## Test Setup
+- Compete the local development setup
+- Create a `.env.test` file and fill in the require fields for local development. See `.env.test.example` for blueprint.
+- Run `yarn test`
+
 ## API Documentation
 
 [https://documenter.getpostman.com/view/20628325/2sAXxS8WmV](https://documenter.getpostman.com/view/20628325/2sAXxS8WmV)
