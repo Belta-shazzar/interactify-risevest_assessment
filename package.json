@@ -7,7 +7,7 @@
     "build": "tsc && tsc-alias",
     "start": "cross-env NODE_ENV=production node dist/server.js",
     "start:prod": "npm run build && npm run start",
-    "test": "cross-env NODE_ENV=test npx prisma migrate dev && jest --watchAll --coverage",
+    "test": "cross-env NODE_ENV=test npm run prisma:migrate && jest --watchAll --coverage",
     "prisma:init": "prisma init",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --preview-feature",
