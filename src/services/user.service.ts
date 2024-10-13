@@ -89,7 +89,7 @@ export class UserService {
     return users;
   }
 
-  // Query for the performance challenge
+  // Query for the performance
   public async getTopThreeAuthorsByPostCountWithTheirLatestComment(): Promise<any> {
     const users = await this.prisma.$queryRaw`
   WITH UserPostCounts AS (
