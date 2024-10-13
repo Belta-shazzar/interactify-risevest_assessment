@@ -71,6 +71,10 @@ export class App {
     routes.forEach((route) => {
       this.app.use("/", route.router);
     });
+
+    this.app.use((req, res, next) => {
+      throw new HttpException(404, "URL not Found");
+    });
   }
 
   private initializeResponseTransform() {

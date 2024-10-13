@@ -1,5 +1,8 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import { Config } from "@/interfaces/config.interface";
+
+const envPath = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
+dotenv.config({ path: envPath });
 
 const config: Config = {
   app: {
@@ -17,7 +20,7 @@ const config: Config = {
   },
   database: {
     url: process.env.DATABASE_URL!,
-    redisHost: process.env.REDIS_HOST!
+    redisHost: process.env.REDIS_HOST!,
   },
 };
 

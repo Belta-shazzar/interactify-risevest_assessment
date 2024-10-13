@@ -24,23 +24,6 @@ services:
     networks:
       - app-network
 
-  interactify:
-    container_name: interactify
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    env_file:
-      - .env
-    ports:
-      - '$PORT:$PORT'
-    depends_on:
-      - postgres
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    command: yarn start:dev
-
 volumes:
   redis-data:
   pgdata:
