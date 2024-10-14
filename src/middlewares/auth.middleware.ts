@@ -4,7 +4,7 @@ import { HttpException } from "@/exceptions/http.exception";
 import {
   DataStoredInToken,
   RequestWithUser,
-} from "@/interfaces/auth.middleware";
+} from "@/interfaces/auth.interface";
 import config from "@/config";
 import { UserService } from "@/services/user.service";
 

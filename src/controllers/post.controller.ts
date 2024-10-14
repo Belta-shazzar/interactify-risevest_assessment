@@ -1,5 +1,5 @@
 import { CreatePostDto } from "@/dto/post.dto";
-import { RequestWithUser } from "@/interfaces/auth.middleware";
+import { RequestWithUser } from "@/interfaces/auth.interface";
 import { PostService } from "@/services/post.service";
 import { User } from "@prisma/client";
 import { Request, Response, NextFunction } from "express";

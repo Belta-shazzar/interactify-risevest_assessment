@@ -1,6 +1,6 @@
 import { LoginDto, SignUpDto } from "@/dto/auth.dto";
 import { HttpException } from "@/exceptions/http.exception";
-import { AuthData, DataStoredInToken } from "@/interfaces/auth.middleware";
+import { AuthData, DataStoredInToken } from "@/interfaces/auth.interface";
 import { User } from "@prisma/client";
 import { UserService } from "@services/user.service";
 import { compare, hash } from "bcrypt";

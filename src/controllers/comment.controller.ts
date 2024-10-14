@@ -1,5 +1,5 @@
 import { CreateCommentDto } from "@/dto/comment.dto";
-import { RequestWithUser } from "@/interfaces/auth.middleware";
+import { RequestWithUser } from "@/interfaces/auth.interface";
 import { CommentService } from "@/services/comment.service";
 import { User } from "@prisma/client";
 import { Response, NextFunction } from "express";
