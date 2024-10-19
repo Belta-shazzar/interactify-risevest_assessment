@@ -1,6 +1,6 @@
 import { CreateCommentDto } from "@/dto/comment.dto";
 import { Comment, Post, PrismaClient, User } from "@prisma/client";
-import { PostService } from "./post.service";
+import { PostService } from "@/services/post.service";
 
 export class CommentService {
   private comment = new PrismaClient().comment;

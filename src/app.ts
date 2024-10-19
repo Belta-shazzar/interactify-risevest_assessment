@@ -73,7 +73,7 @@ export class App {
     });
 
     this.app.use((req, res, next) => {
-      throw new HttpException(404, "URL not Found");
+      throw new HttpException(httpStatus.NOT_FOUND, "URL not Found");
     });
   }
 

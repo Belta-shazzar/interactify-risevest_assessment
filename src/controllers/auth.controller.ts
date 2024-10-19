@@ -1,7 +1,6 @@
 import { LoginDto, SignUpDto } from "@/dto/auth.dto";
 import { AuthData, RequestWithUser } from "@/interfaces/auth.interface";
 import { AuthService } from "@/services/auth.service";
-import { logger } from "@/utils/logger";
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 
