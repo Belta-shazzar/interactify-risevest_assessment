@@ -9,7 +9,7 @@
     "start:prod": "npm run build && npm run start",
     "test": "cross-env NODE_ENV=test jest --coverage",
     "prisma:init": "prisma init",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "prisma generate --no-engine",
     "prisma:migrate": "prisma migrate dev --preview-feature",
     "seeder:seed": "ts-node seeders/seed.ts",
     "clean": "rimraf dist"
@@ -62,6 +62,7 @@
     "morgan": "^1.10.0",
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",
+    "rimraf": "^6.0.1",
     "tslib": "^2.7.0",
     "winston": "^3.15.0",
     "winston-daily-rotate-file": "^5.0.0"

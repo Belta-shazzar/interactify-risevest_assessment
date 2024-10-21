@@ -15,8 +15,6 @@ COPY  . .
 
 FROM base AS builder
 
-RUN npm run prisma:generate
-
 RUN npm run build
 
 # --- Production
@@ -30,9 +28,6 @@ WORKDIR /usr/src/app
 ## Install production dependencies inside the container
 COPY package*.json ./
 RUN npm install --production
-
-# Copy only production build and necessary files
-COPY --from=builder /usr/src/app/dist ./dist/
 
 # Ensure entrypoint.sh is available and executable
 COPY ./entrypoint.sh ./entrypoint.sh

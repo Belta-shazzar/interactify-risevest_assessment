@@ -7,7 +7,10 @@ let redis: Redis | null = null;
 export const initRedis = () => {
   if (!redis) {
     redis = new Redis({
-      host: config.database.redisHost,
+      host:
+        config.app.node_env === "production"
+          ? config.database.redisHost
+          : "localhost",
       port: config.database.redisPort,
       lazyConnect: true,
       retryStrategy(times) {
