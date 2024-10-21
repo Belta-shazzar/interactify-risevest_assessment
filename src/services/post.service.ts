@@ -1,7 +1,8 @@
 import prisma from "@/config/prisma";
-// import redis from "@/config/redis";
+import getRedis from "@/config/redis";
 import { CreatePostDto } from "@/dto/post.dto";
 import { HttpException } from "@/exceptions/http.exception";
+import { logger } from "@/utils/logger";
 import { paginateResponse } from "@/utils/paginate";
 import { Post, User } from "@prisma/client";
 import httpStatus from "http-status";
@@ -17,20 +18,24 @@ export class PostService {
       data: { ...postDto, authorId: author.id },
     });
 
-    // await redis.set(post.id, JSON.stringify(post)); // Cache created post
+    try {
+      await getRedis.set(post.id, JSON.stringify(post)); // Cache created post
+    } catch (error) {
+      logger.error("Failed to cache post in Redis:", error);
+    }
     return post;
   }
 
   public async getPostById(postId: string): Promise<Post> {
-    // const checkCache = await redis.get(postId);
+    const checkCache = await getRedis.get(postId);
 
-    // if (checkCache) return JSON.parse(checkCache);
+    if (checkCache) return JSON.parse(checkCache);
 
     const post = await this.post.findUnique({ where: { id: postId } });
 
     if (!post)
       throw new HttpException(httpStatus.NOT_FOUND, "Post does not exist");
-    // await redis.set(post.id, JSON.stringify(post));
+    await getRedis.set(post.id, JSON.stringify(post));
     return post;
   }
 

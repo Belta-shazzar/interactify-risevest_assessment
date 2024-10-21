@@ -15,5 +15,6 @@ export interface Config {
   database: {
     url: string;
     redisHost: string;
+    redisPort: number
   };
 }

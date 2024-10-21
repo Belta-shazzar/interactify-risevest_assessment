@@ -1,10 +1,30 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production # Targeting the production stage of your Dockerfile
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_NAME}
+      REDIS_URL: redis://my_redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - app-network
+    command: ["sh", "./entrypoint.sh"]
+
   postgres:
     container_name: interactify_postgres
     image: postgres:15
     restart: always
     env_file:
-      - .env
+      - .env # Pulling environment variables from .env file
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -12,7 +32,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   redis:
     image: redis:latest

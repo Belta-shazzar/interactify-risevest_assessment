@@ -7,11 +7,25 @@ import { PostService } from "../../src/services/post.service";
 import { generateUUID } from "../util";
 import { CreatePostDto } from "../../src/dto/post.dto";
 import { faker } from "@faker-js/faker";
+import redis, { closeRedis } from "../../src/config/redis";
 
 jest.mock("../../src/config/prisma.ts", () => ({
   __esModule: true,
   default: mockDeep<PrismaClient>(),
 }));
+
+jest.mock("../../src/config/redis.ts", () => {
+  const redisMock = {
+    get: jest.fn(),
+    set: jest.fn(),
+    quit: jest.fn(),
+  };
+  return {
+    __esModule: true,
+    default: redisMock,
+    getRedis: () => redisMock,
+  };
+});
 
 const mockedPrisma = prisma as unknown as DeepMockProxy<PrismaClient>;
 
@@ -19,7 +33,7 @@ describe("PostService unit test", () => {
   let postService: PostService;
 
   const postId: string = generateUUID();
-  const authorId: string = generateUUID()
+  const authorId: string = generateUUID();
   const postTitle: string = "New Post Title";
   const postContent: string = "The content for this post";
 
@@ -39,42 +53,77 @@ describe("PostService unit test", () => {
   });
 
   describe("createPost", () => {
-    it("should create a new post", async () => {
-      const postDto: CreatePostDto = {
-        title: postTitle,
-        content: postContent,
-      };
+    const postDto: CreatePostDto = {
+      title: postTitle,
+      content: postContent,
+    };
 
-      const author: Partial<User> = {
-        id: authorId,
-        name: `${faker.person.firstName()} ${faker.person.lastName()}`,
-        email: faker.internet.email(),
-        password: "password",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deletedAt: null,
-      };
-
+    const author: Partial<User> = {
+      id: authorId,
+      name: `${faker.person.firstName()} ${faker.person.lastName()}`,
+      email: faker.internet.email(),
+      password: "password",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+    };
+    it("should create a post and cache it", async () => {
       mockedPrisma.post.create.mockResolvedValue(expectedPost);
+      (redis.set as jest.Mock).mockResolvedValue("OK");
 
       const result = await postService.createPost(postDto, author);
 
       expect(mockedPrisma.post.create).toHaveBeenCalledWith({
         data: { ...postDto, authorId: author.id },
       });
+
+      expect(redis.set).toHaveBeenCalledWith(
+        expectedPost.id,
+        JSON.stringify(expectedPost)
+      );
+
       expect(result).toEqual(expectedPost);
+    });
+
+    it("should create post even if redis caching fails", async () => {
+      mockedPrisma.post.create.mockResolvedValue(expectedPost);
+      (redis.set as jest.Mock).mockRejectedValue(
+        new Error("Failed to cache post in Redis:")
+      );
+
+      const result = await postService.createPost(postDto, author);
+
+      expect(result).toEqual(expectedPost);
+      expect(prisma.post.create).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("getPostById", () => {
-    it("should return a post when found", async () => {
+    it("should return post from cache if available", async () => {
+      (redis.get as jest.Mock).mockResolvedValue(JSON.stringify(expectedPost));
+
+      const result = await postService.getPostById(expectedPost.id);
+
+      expect(redis.get).toHaveBeenCalledWith(expectedPost.id);
+      expect(mockedPrisma.post.findUnique).not.toHaveBeenCalled();
+      expect(JSON.stringify(result)).toEqual(JSON.stringify(expectedPost));
+    });
+
+    it("should fetch from database and cache if not in cache", async () => {
+      (redis.get as jest.Mock).mockResolvedValue(null);
       mockedPrisma.post.findUnique.mockResolvedValue(expectedPost);
+      (redis.set as jest.Mock).mockResolvedValue("OK");
 
-      const result = await postService.getPostById(postId);
+      const result = await postService.getPostById(expectedPost.id);
 
+      expect(redis.get).toHaveBeenCalledWith(expectedPost.id);
       expect(mockedPrisma.post.findUnique).toHaveBeenCalledWith({
-        where: { id: postId },
+        where: { id: expectedPost.id },
       });
+      expect(redis.set).toHaveBeenCalledWith(
+        expectedPost.id,
+        JSON.stringify(expectedPost)
+      );
       expect(result).toEqual(expectedPost);
     });
 

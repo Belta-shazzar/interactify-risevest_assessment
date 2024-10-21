@@ -1,7 +1,7 @@
 import { AuthService } from "../../src/services/auth.service";
 import { UserService } from "../../src/services/user.service";
 import { sign } from "jsonwebtoken";
-import { hash, compare } from "bcrypt";
+import { hash, compare } from "bcryptjs";
 import { faker } from "@faker-js/faker";
 import { User } from "@prisma/client";
 import { LoginDto, SignUpDto } from "../../src/dto/auth.dto";
@@ -21,7 +21,7 @@ jest.mock("../../src/services/user.service", () => {
 });
 
 // Mock bcrypt
-jest.mock("bcrypt", () => ({
+jest.mock("bcryptjs", () => ({
   hash: jest.fn(),
   compare: jest.fn(),
 }));

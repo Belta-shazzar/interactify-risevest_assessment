@@ -13,6 +13,7 @@ import { HttpException } from "@/exceptions/http.exception";
 import httpStatus from "http-status";
 import ResponseInterceptor from "@/middlewares/transform-response.middleware";
 import prisma from "@/config/prisma";
+import { initRedis } from "./config/redis";
 
 export class App {
   public app: express.Application;
@@ -30,7 +31,7 @@ export class App {
     this.initializeErrorHandling();
   }
 
-  public listen() {
+  public async listen() {
     prisma
       .$connect()
       .then(() => {
@@ -41,8 +42,10 @@ export class App {
         });
       })
       .catch((error) => {
-        logger.error("An error occurred: %s", error.message, { error });
+        logger.error("An error occurred: ", error);
       });
+    const redis = initRedis();
+    await redis.connect();
   }
 
   public getServer() {

@@ -3,7 +3,7 @@ import { HttpException } from "@/exceptions/http.exception";
 import { AuthData, DataStoredInToken } from "@/interfaces/auth.interface";
 import { User } from "@prisma/client";
 import { UserService } from "@services/user.service";
-import { compare, hash } from "bcrypt";
+import { compare, hash } from "bcryptjs";
 import httpStatus from "http-status";
 import { sign } from "jsonwebtoken";
 import config from "@/config";

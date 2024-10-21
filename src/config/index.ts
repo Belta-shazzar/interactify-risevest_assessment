@@ -20,6 +20,9 @@ const config: Config = {
   database: {
     url: process.env.DATABASE_URL!,
     redisHost: process.env.REDIS_HOST!,
+    redisPort: process.env.REDIS_PORT
+      ? parseInt(process.env.REDIS_PORT, 10)
+      : 6379,
   },
 };
 

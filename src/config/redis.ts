@@ -1,18 +1,44 @@
-// import { logger } from "@/utils/logger";
-// import Redis from "ioredis";
-// import config from "@/config";
+import { logger } from "@/utils/logger";
+import Redis from "ioredis";
+import config from "@/config";
 
-// const redis = new Redis({
-//   host: config.database.redisHost,
-//   port: 6379,
-// });
+let redis: Redis | null = null;
 
-// redis.on("connect", () => {
-//   logger.info("🗄️  Redis connection successful");
-// });
+export const initRedis = () => {
+  if (!redis) {
+    redis = new Redis({
+      host: config.database.redisHost,
+      port: config.database.redisPort,
+      lazyConnect: true,
+      retryStrategy(times) {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      },
+    });
 
-// redis.on("error", (err) => {
-//   logger.error("Redis connection error:", err);
-// });
+    redis.on("connect", () => {
+      logger.info("🗄️  Redis connection successful");
+    });
 
-// export default redis;
+    redis.on("error", (err) => {
+      logger.error("Redis connection error:", err);
+    });
+  }
+  return redis;
+};
+
+export const closeRedis = async () => {
+  if (redis) {
+    await redis.quit();
+    redis = null;
+  }
+};
+
+export const getRedis = () => {
+  if (!redis) {
+    redis = initRedis();
+  }
+  return redis;
+};
+
+export default getRedis();
