@@ -22,7 +22,6 @@ export class PostService {
   }
 
   public async getPostById(postId: string): Promise<Post> {
-    console.log("called!")
     // const checkCache = await redis.get(postId);
 
     // if (checkCache) return JSON.parse(checkCache);

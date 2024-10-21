@@ -25,7 +25,6 @@ export class UserController {
   ) => {
     try {
       const response = await this.userService.getTopThreeAuthorsByPostCount();
-      console.log("Without latest comment: ", response);
 
       res.status(httpStatus.OK).json({ ...response });
     } catch (error) {
@@ -42,7 +41,6 @@ export class UserController {
       const response =
         await this.userService.getTopThreeAuthorsByPostCountWithTheirLatestComment();
 
-        console.log("With latest comment: ", response);
       res.status(httpStatus.OK).json({ ...response });
     } catch (error) {
       next(error);

@@ -24,7 +24,6 @@ export class CommentController {
         postId
       );
 
-      console.log(response)
       res.status(httpStatus.CREATED).json({ ...response });
     } catch (error) {
       next(error);

@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
 import { Config } from "@/interfaces/config.interface";
 
-const envPath = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
-dotenv.config({ path: envPath });
+dotenv.config({ path: ".env" });
 
 const config: Config = {
   app: {
