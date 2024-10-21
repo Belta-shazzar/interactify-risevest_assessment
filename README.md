@@ -10,7 +10,7 @@ Prisma was chosen as the ORM because of its intuitive, type-safe query system an
 
 The above query is an optimized version of what was given me in the **readme.md** of my assessment. While the query uses correlated subqueries in both the WHERE and ORDER BY clauses, which can be performance-intensive on large datasets, my query employs Common Table Expressions (CTEs) to pre-calculate post counts and latest comments, improving performance and ensuring clarity and maintainability with a structure that's easier to read, modify, or extend. Additionally, my query handles null values with COALESCE to return 0 for users with no posts, and offers flexibility for adding more complex logic without complicating the main query.
 
-To test that it works, run `yarn seeder:seed` to seed the database after setting up the project in development mode. see [Local Development Setup](#local-development-setup)
+To test that it works, run `yarn seeder:seed` to seed the database after setting up the project in development mode, then call the endpoint on postman or your choice API client. For local development set up, see [Local Development Setup](#local-development-setup)
 
 ### Link to the Assessment
 
@@ -35,8 +35,7 @@ To test that it works, run `yarn seeder:seed` to seed the database after setting
 - Connect to database with your choice database client
 
 ## Test Setup
-- Compete the local development setup
-- Create a `.env.test` file and fill in the require fields for local development. See `.env.test.example` for blueprint.
+- Complete the local development setup
 - Run `yarn test`
 
 ## API Documentation

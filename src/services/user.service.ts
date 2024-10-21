@@ -1,12 +1,12 @@
+import prisma from "@/config/prisma";
 import { SignUpDto } from "@/dto/auth.dto";
 import { HttpException } from "@/exceptions/http.exception";
 import { paginateResponse } from "@/utils/paginate";
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import httpStatus from "http-status";
 
 export class UserService {
-  private prisma = new PrismaClient();
-  private user = this.prisma.user;
+  private user = prisma.user;
 
   public async createUser(signUpDto: SignUpDto): Promise<User> {
     const user = await this.user.create({
@@ -16,7 +16,7 @@ export class UserService {
     return user;
   }
 
-  public async getUserByEmail(email: string): Promise<User> {
+  public async getUserByEmail(email: string): Promise<User | null> {
     return this.user.findUnique({ where: { email: email } });
   }
 
@@ -55,7 +55,7 @@ export class UserService {
 
   // Optmized the exact query in the query optimization task
   public async getTopThreeAuthorsByPostCount(): Promise<any> {
-    const users = await this.prisma.$queryRaw`
+    const users = await prisma.$queryRaw`
         WITH UserPostCounts AS (
         SELECT "authorId", COUNT(id)::INTEGER AS post_count
         FROM "Post"
@@ -91,7 +91,7 @@ export class UserService {
 
   // Query for the performance
   public async getTopThreeAuthorsByPostCountWithTheirLatestComment(): Promise<any> {
-    const users = await this.prisma.$queryRaw`
+    const users = await prisma.$queryRaw`
   WITH UserPostCounts AS (
     SELECT "authorId", COUNT(id)::INTEGER AS post_count
     FROM "Post"

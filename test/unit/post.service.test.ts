@@ -1,89 +1,144 @@
-import { PrismaClient, User } from "@prisma/client";
-import { UserService } from "../../src/services/user.service";
+import { Post, PrismaClient, User } from "@prisma/client";
+import { DeepMockProxy, mockDeep } from "jest-mock-extended";
+import httpStatus from "http-status";
+import { HttpException } from "../../src/exceptions/http.exception";
+import prisma from "../../src/config/prisma";
 import { PostService } from "../../src/services/post.service";
-import { SignUpDto } from "../../src/dto/auth.dto";
+import { generateUUID } from "../util";
 import { CreatePostDto } from "../../src/dto/post.dto";
 import { faker } from "@faker-js/faker";
 
-let prisma: PrismaClient;
+jest.mock("../../src/config/prisma.ts", () => ({
+  __esModule: true,
+  default: mockDeep<PrismaClient>(),
+}));
 
-beforeAll(async () => {
-  prisma = new PrismaClient();
-  await prisma.$connect();
-});
+const mockedPrisma = prisma as unknown as DeepMockProxy<PrismaClient>;
 
-afterAll(async () => {
-  await prisma.comment.deleteMany();
-  await prisma.post.deleteMany();
-  await prisma.user.deleteMany();
+describe("PostService unit test", () => {
+  let postService: PostService;
 
-  await prisma.$disconnect();
-});
+  const postId: string = generateUUID();
+  const authorId: string = generateUUID()
+  const postTitle: string = "New Post Title";
+  const postContent: string = "The content for this post";
 
-describe("Post Service", () => {
-  const postDto: CreatePostDto = {
-    title: "Test post title",
-    content: "Dummy content for post",
+  const expectedPost: Post = {
+    id: postId,
+    authorId,
+    title: postTitle,
+    content: postContent,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: null,
   };
-  it("should create post", async () => {
-    const postService = new PostService();
-    const userService = new UserService();
 
-    const signUpDto: SignUpDto = {
-      name: `${faker.person.firstName()} ${faker.person.lastName()}`,
-      email: faker.internet.email(),
-      password: "password",
-    };
-
-    const user = await userService.createUser(signUpDto);
-
-    const post = await postService.createPost(postDto, user);
-    expect(post).toHaveProperty("id");
-    expect(post).toHaveProperty("authorId");
+  beforeEach(() => {
+    jest.clearAllMocks();
+    postService = new PostService();
   });
 
-  it("should get post by id", async () => {
-    const postService = new PostService();
-    const userService = new UserService();
+  describe("createPost", () => {
+    it("should create a new post", async () => {
+      const postDto: CreatePostDto = {
+        title: postTitle,
+        content: postContent,
+      };
 
-    const signUpDto: SignUpDto = {
-      name: `${faker.person.firstName()} ${faker.person.lastName()}`,
-      email: faker.internet.email(),
-      password: "password",
-    };
+      const author: Partial<User> = {
+        id: authorId,
+        name: `${faker.person.firstName()} ${faker.person.lastName()}`,
+        email: faker.internet.email(),
+        password: "password",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      };
 
-    const user = await userService.createUser(signUpDto);
+      mockedPrisma.post.create.mockResolvedValue(expectedPost);
 
-    const newPost = await postService.createPost(postDto, user);
+      const result = await postService.createPost(postDto, author);
 
-    const post = await postService.getPostById(newPost.id);
-
-    expect(post).toHaveProperty("id");
-    expect(post).toHaveProperty("authorId");
-    expect(post.id).toEqual(newPost.id);
+      expect(mockedPrisma.post.create).toHaveBeenCalledWith({
+        data: { ...postDto, authorId: author.id },
+      });
+      expect(result).toEqual(expectedPost);
+    });
   });
 
-  it("should get all author's post", async () => {
-    const postService = new PostService();
-    const userService = new UserService();
+  describe("getPostById", () => {
+    it("should return a post when found", async () => {
+      mockedPrisma.post.findUnique.mockResolvedValue(expectedPost);
 
-    const signUpDto: SignUpDto = {
-      name: `${faker.person.firstName()} ${faker.person.lastName()}`,
-      email: faker.internet.email(),
-      password: "password",
-    };
+      const result = await postService.getPostById(postId);
 
-    const user = await userService.createUser(signUpDto);
+      expect(mockedPrisma.post.findUnique).toHaveBeenCalledWith({
+        where: { id: postId },
+      });
+      expect(result).toEqual(expectedPost);
+    });
 
-    await postService.createPost(postDto, user);
+    it("should throw HttpException when user is not found", async () => {
+      mockedPrisma.post.findUnique.mockResolvedValue(null);
 
-    const response = await postService.getPostsByAuthorId(user.id, 1, 10);
+      await expect(postService.getPostById(postId)).rejects.toThrow(
+        new HttpException(httpStatus.NOT_FOUND, "Post does not exist")
+      );
 
-    expect(Array.isArray(response.data)).toBe(true);
-    expect(response.data[0]).toHaveProperty("id");
-    expect(response.data[0]).toHaveProperty("authorId");
-    expect(response.data[0].authorId).toEqual(user.id);
-    expect(typeof response.count).toBe("number");
-    expect(typeof response.currentPage).toBe("number");
+      expect(mockedPrisma.post.findUnique).toHaveBeenCalledWith({
+        where: { id: postId },
+      });
+    });
+  });
+
+  describe("getPostsByAuthorId", () => {
+    it("should return paginated posts by an author's id", async () => {
+      const page = 1;
+      const limit = 10;
+      const authorId = generateUUID();
+
+      const mockPosts: Post[] = [
+        {
+          id: generateUUID(),
+          authorId,
+          title: "Title One",
+          content: "Content One",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: null,
+        },
+        {
+          id: generateUUID(),
+          authorId,
+          title: "Title Two",
+          content: "Content Two",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: null,
+        },
+      ];
+      const totalCount = 2;
+
+      mockedPrisma.post.findMany.mockResolvedValue(mockPosts as Post[]);
+      mockedPrisma.post.count.mockResolvedValue(totalCount);
+
+      const result = await postService.getPostsByAuthorId(
+        authorId,
+        page,
+        limit
+      );
+
+      expect(mockedPrisma.post.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: limit,
+        where: { authorId },
+      });
+      expect(mockedPrisma.post.count).toHaveBeenCalled();
+      expect(result).toHaveProperty("data", mockPosts);
+      expect(result).toHaveProperty("count", totalCount);
+      expect(result).toHaveProperty("currentPage");
+      expect(result).toHaveProperty("nextPage");
+      expect(result).toHaveProperty("prevPage");
+    });
   });
 });

@@ -1,12 +1,13 @@
-import redis from "@/config/redis";
+import prisma from "@/config/prisma";
+// import redis from "@/config/redis";
 import { CreatePostDto } from "@/dto/post.dto";
 import { HttpException } from "@/exceptions/http.exception";
 import { paginateResponse } from "@/utils/paginate";
-import { Post, PrismaClient, User } from "@prisma/client";
+import { Post, User } from "@prisma/client";
 import httpStatus from "http-status";
 
 export class PostService {
-  private post = new PrismaClient().post;
+  private post = prisma.post;
 
   public async createPost(
     postDto: CreatePostDto,
@@ -16,19 +17,21 @@ export class PostService {
       data: { ...postDto, authorId: author.id },
     });
 
-    await redis.set(post.id, JSON.stringify(post)); // Cache created post
+    // await redis.set(post.id, JSON.stringify(post)); // Cache created post
     return post;
   }
 
   public async getPostById(postId: string): Promise<Post> {
-    const checkCache = await redis.get(postId);
+    console.log("called!")
+    // const checkCache = await redis.get(postId);
 
-    if (checkCache) return JSON.parse(checkCache);
+    // if (checkCache) return JSON.parse(checkCache);
 
     const post = await this.post.findUnique({ where: { id: postId } });
 
     if (!post)
       throw new HttpException(httpStatus.NOT_FOUND, "Post does not exist");
+    // await redis.set(post.id, JSON.stringify(post));
     return post;
   }
 
@@ -45,7 +48,7 @@ export class PostService {
       where: { authorId },
     });
 
-    const count = await this.post.count();
+    const count = await this.post.count({ where: { authorId } });
 
     return paginateResponse([posts, count], page, limit);
   }
